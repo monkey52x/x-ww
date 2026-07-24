@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "home": "Home",
+    "fun": "Fun",
+    "randomizer": "Randomizer",
+    "rust": "Rust",
+    "minecraft": "Minecraft"
+  },
+  "home": {
+    "title": "x-ww",
+    "subtitle": "The group where nothing goes as planned",
+    "description": "Hey! We are x-ww. Our content, fun stuff, and games will be here."
+  },
+  "fun": {
+    "title": "Fun",
+    "description": "Various interesting and funny things",
+    "randomizer": "Randomizer",
+    "randomizerDesc": "Random stuff for fun",
+    "games": "Games"
+  },
+  "randomizer": {
+    "title": "Randomizer",
+    "description": "Random number generator and random pick from list",
+    "number": "Random Number",
+    "from": "From",
+    "to": "To",
+    "generate": "Random!",
+    "retry": "Retry",
+    "list": "Random from List",
+    "listPlaceholder": "Enter one option per line",
+    "attempts": "Number of attempts",
+    "result": "Result"
+  },
+  "rust": {
+    "title": "Rust",
+    "description": "Everything related to Rust"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "description": "Our adventures in Minecraft"
+  },
+  "back": "Back",
+  "language": "Language"
+}

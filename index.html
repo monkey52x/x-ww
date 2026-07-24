@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/x-ww/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>x-ww</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+      (function() {
+        var l = window.location;
+        if (l.search.indexOf('?/') === 0) {
+          var rest = l.search.slice(2);
+          var idx = rest.indexOf('&');
+          var path = idx !== -1 ? '/' + rest.slice(0, idx) : '/' + rest;
+          var qs = idx !== -1 ? rest.slice(idx + 1).replace(/~and~/g, '&') : '';
+          history.replaceState(null, null, path + (qs ? '?' + qs : '') + l.hash);
+        }
+      })();
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

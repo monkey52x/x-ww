@@ -1,0 +1,17 @@
+.footer {
+  margin: 40px 16px 16px;
+  border-radius: 20px;
+  padding: 0 24px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+}
+
+.footer-copy {
+  color: var(--white-muted);
+  font-size: 0.85rem;
+}

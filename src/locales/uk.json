@@ -1,0 +1,44 @@
+{
+  "nav": {
+    "home": "Головна",
+    "fun": "Приколи",
+    "randomizer": "Рандомайзер",
+    "rust": "Rust",
+    "minecraft": "Minecraft"
+  },
+  "home": {
+    "title": "x-ww",
+    "subtitle": "Група, де все відбувається не за планом",
+    "description": "Привіт! Ми — x-ww. Тут буде наш контент, приколи та ігри."
+  },
+  "fun": {
+    "title": "Приколи",
+    "description": "Тут різне цікаве та веселе",
+    "randomizer": "Рандомайзер",
+    "randomizerDesc": "Випадкові штуки для розваги",
+    "games": "Ігри"
+  },
+  "randomizer": {
+    "title": "Рандомайзер",
+    "description": "Генератор випадкових чисел та рандом зі списку",
+    "number": "Випадкове число",
+    "from": "Від",
+    "to": "До",
+    "generate": "Рандом!",
+    "retry": "Повторити",
+    "list": "Рандом зі списку",
+    "listPlaceholder": "Вводь по одному варіанту на рядок",
+    "attempts": "Кількість спроб",
+    "result": "Результат"
+  },
+  "rust": {
+    "title": "Rust",
+    "description": "Все що пов'язано з Rust"
+  },
+  "minecraft": {
+    "title": "Minecraft",
+    "description": "Наші пригоди в Minecraft"
+  },
+  "back": "Назад",
+  "language": "Мова"
+}
