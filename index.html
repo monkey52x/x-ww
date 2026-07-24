@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/x-ww/favicon.png" />
+    <link rel="icon" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>x-ww</title>
   </head>
@@ -13,6 +13,7 @@
         var l = window.location;
         if (l.search.indexOf('?/') === 0) {
           var rest = l.search.slice(2);
+          if (!rest) return;
           var idx = rest.indexOf('&');
           var path = idx !== -1 ? '/' + rest.slice(0, idx) : '/' + rest;
           var qs = idx !== -1 ? rest.slice(idx + 1).replace(/~and~/g, '&') : '';
@@ -20,6 +21,6 @@
         }
       })();
     </script>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
