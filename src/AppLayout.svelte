@@ -12,6 +12,10 @@
 
   const BIO_PATHS = ['/vlogf', '/seido']
   const location = useLocation()
+
+  $: if ($location.pathname) {
+    window.scrollTo(0, 0)
+  }
 </script>
 
 {#if !BIO_PATHS.includes($location.pathname)}
