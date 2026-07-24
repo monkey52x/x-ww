@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>x-ww</title>
-  <script>
-    (function() {
-      var l = window.location;
-      if (l.search.indexOf('?/') === 0) return;
-      var rest = l.pathname.replace(/\/$/, '').slice(1);
-      var qs = l.search.replace(/&/g, '~and~');
-      l.replace('/?/' + rest + (qs ? '&' + qs.slice(1) : '') + l.hash);
-    })();
-  </script>
-</head>
-<body></body>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>x-ww</title>
+    <script type="module" crossorigin src="/assets/index-0SHWi7t7.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DfEQBg0C.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

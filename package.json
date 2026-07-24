@@ -6,7 +6,7 @@
   "homepage": "https://x-ww.xyz",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && copy docs\\index.html docs\\404.html",
     "lint": "oxlint",
     "preview": "vite preview",
     "deploy": "npm run build && npx gh-pages -d docs"
