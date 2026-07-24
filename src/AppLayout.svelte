@@ -1,5 +1,6 @@
 <script>
   import { useLocation } from 'svelte-routing'
+  import { onMount } from 'svelte'
   import Header from './components/Header.svelte'
   import Footer from './components/Footer.svelte'
   import Home from './pages/Home.svelte'
@@ -12,6 +13,11 @@
 
   const BIO_PATHS = ['/vlogf', '/seido']
   const location = useLocation()
+
+  onMount(() => {
+    history.scrollRestoration = 'manual'
+    window.scrollTo(0, 0)
+  })
 
   $: if ($location.pathname) {
     window.scrollTo(0, 0)
