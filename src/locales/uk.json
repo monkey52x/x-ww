@@ -3,6 +3,7 @@
     "home": "Головна",
     "fun": "Приколи",
     "randomizer": "Рандомайзер",
+    "headsOrTails": "Орел чи Решка",
     "rust": "Rust",
     "minecraft": "Minecraft"
   },
@@ -16,6 +17,7 @@
     "description": "Тут різне цікаве та веселе",
     "randomizer": "Рандомайзер",
     "randomizerDesc": "Випадкові штуки для розваги",
+    "headsOrTailsDesc": "Підкинь монетку",
     "games": "Ігри"
   },
   "randomizer": {
@@ -38,6 +40,14 @@
   "minecraft": {
     "title": "Minecraft",
     "description": "Наші пригоди в Minecraft"
+  },
+  "headsOrTails": {
+    "title": "Орел чи Решка",
+    "description": "Підкинь монетку та дізнайся результат",
+    "heads": "Орел",
+    "tails": "Решка",
+    "flip": "Кинути!",
+    "retry": "Ще раз"
   },
   "back": "Назад",
   "language": "Мова"

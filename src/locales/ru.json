@@ -3,6 +3,7 @@
     "home": "Главная",
     "fun": "Приколы",
     "randomizer": "Рандомайзер",
+    "headsOrTails": "Орёл и Решка",
     "rust": "Rust",
     "minecraft": "Minecraft"
   },
@@ -16,6 +17,7 @@
     "description": "Тут всякое интересное и весёлое",
     "randomizer": "Рандомайзер",
     "randomizerDesc": "Случайные штуки для веселья",
+    "headsOrTailsDesc": "Подбрось монетку",
     "games": "Игры"
   },
   "randomizer": {
@@ -38,6 +40,14 @@
   "minecraft": {
     "title": "Minecraft",
     "description": "Наши приключения в Minecraft"
+  },
+  "headsOrTails": {
+    "title": "Орёл и Решка",
+    "description": "Подбрось монетку и узнай результат",
+    "heads": "Орёл",
+    "tails": "Решка",
+    "flip": "Бросить!",
+    "retry": "Ещё раз"
   },
   "back": "Назад",
   "language": "Язык"

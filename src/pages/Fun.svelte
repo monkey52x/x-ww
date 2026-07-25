@@ -3,6 +3,7 @@
 
   const funs = [
     { to: '/fun/randomizer', icon: '🎲', key: 'randomizer' },
+    { to: '/fun/heads-or-tails', icon: '🪙', key: 'headsOrTails' },
   ]
 
   import { navigate } from 'svelte-routing'

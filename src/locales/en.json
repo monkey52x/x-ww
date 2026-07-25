@@ -3,6 +3,7 @@
     "home": "Home",
     "fun": "Fun",
     "randomizer": "Randomizer",
+    "headsOrTails": "Heads or Tails",
     "rust": "Rust",
     "minecraft": "Minecraft"
   },
@@ -16,6 +17,7 @@
     "description": "Various interesting and funny things",
     "randomizer": "Randomizer",
     "randomizerDesc": "Random stuff for fun",
+    "headsOrTailsDesc": "Flip a coin",
     "games": "Games"
   },
   "randomizer": {
@@ -38,6 +40,14 @@
   "minecraft": {
     "title": "Minecraft",
     "description": "Our adventures in Minecraft"
+  },
+  "headsOrTails": {
+    "title": "Heads or Tails",
+    "description": "Flip a coin and find out",
+    "heads": "Heads",
+    "tails": "Tails",
+    "flip": "Flip!",
+    "retry": "Again"
   },
   "back": "Back",
   "language": "Language"
