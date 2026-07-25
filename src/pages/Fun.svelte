@@ -5,11 +5,6 @@
     { to: '/fun/randomizer', icon: '🎲', key: 'randomizer' },
   ]
 
-  const games = [
-    { to: '/games/rust', icon: '🦀', key: 'rust' },
-    { to: '/games/minecraft', icon: '⛏️', key: 'minecraft' },
-  ]
-
   import { navigate } from 'svelte-routing'
 
   function goTo(path, e) {
@@ -28,17 +23,6 @@
   <h2 class="section-title">🎉 {$t('fun.title')}</h2>
   <div class="fun-grid">
     {#each funs as { to, icon, key }}
-      <a href={to} class="glass fun-card" on:click={(e) => goTo(to, e)}>
-        <span class="fun-card-icon">{icon}</span>
-        <h3 class="fun-card-title">{$t(`nav.${key}`)}</h3>
-        <p class="fun-card-desc">{$t(`fun.${key}Desc`)}</p>
-      </a>
-    {/each}
-  </div>
-
-  <h2 class="section-title">🎮 {$t('fun.games')}</h2>
-  <div class="fun-grid">
-    {#each games as { to, icon, key }}
       <a href={to} class="glass fun-card" on:click={(e) => goTo(to, e)}>
         <span class="fun-card-icon">{icon}</span>
         <h3 class="fun-card-title">{$t(`nav.${key}`)}</h3>

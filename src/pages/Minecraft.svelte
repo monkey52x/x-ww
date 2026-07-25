@@ -9,7 +9,7 @@
 </script>
 
 <div class="page">
-  <a href="/fun" class="back-link" on:click={(e) => goTo('/fun', e)}>
+  <a href="/" class="back-link" on:click={(e) => goTo('/', e)}>
     ← {$t('back')}
   </a>
   <h1 class="page-title">{$t('minecraft.title')}</h1>
