@@ -10,6 +10,8 @@
   import Rust from './pages/Rust.svelte'
   import Minecraft from './pages/Minecraft.svelte'
   import Dota2 from './pages/Dota2.svelte'
+  import DotaRandom from './pages/DotaRandom.svelte'
+  import DotaSingleDraft from './pages/DotaSingleDraft.svelte'
   import Vlogf from './pages/Vlogf.svelte'
   import Seido from './pages/Seido.svelte'
 
@@ -44,6 +46,10 @@
   <Minecraft />
 {:else if $location.pathname === '/games/dota2'}
   <Dota2 />
+{:else if $location.pathname === '/games/dota2/random'}
+  <DotaRandom />
+{:else if $location.pathname === '/games/dota2/single-draft'}
+  <DotaSingleDraft />
 {:else if $location.pathname === '/vlogf'}
   <Vlogf />
 {:else if $location.pathname === '/seido'}

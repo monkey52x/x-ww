@@ -44,7 +44,21 @@
   },
   "dota2": {
     "title": "Dota 2",
-    "description": "Everything related to Dota 2"
+    "description": "Everything related to Dota 2",
+    "random": "Random hero",
+    "randomDesc": "A random hero from the full pool",
+    "draft": "Single draft",
+    "draftDesc": "4 random heroes to pick from"
+  },
+  "randomHero": {
+    "title": "Random hero",
+    "description": "A random hero from the full pool",
+    "generate": "Random!"
+  },
+  "singleDraft": {
+    "title": "Single draft",
+    "description": "4 random heroes, pick one",
+    "generate": "New draft"
   },
   "headsOrTails": {
     "title": "Heads or Tails",

@@ -44,7 +44,21 @@
   },
   "dota2": {
     "title": "Dota 2",
-    "description": "Всё что связано с Dota 2"
+    "description": "Всё что связано с Dota 2",
+    "random": "Рандом герой",
+    "randomDesc": "Случайный герой из всего пула",
+    "draft": "Сингл-драфт",
+    "draftDesc": "4 случайных героя на выбор"
+  },
+  "randomHero": {
+    "title": "Рандом герой",
+    "description": "Случайный герой из всего пула",
+    "generate": "Рандом!"
+  },
+  "singleDraft": {
+    "title": "Сингл-драфт",
+    "description": "4 случайных героя, выбери одного",
+    "generate": "Новый драфт"
   },
   "headsOrTails": {
     "title": "Орёл и Решка",

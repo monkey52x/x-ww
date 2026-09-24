@@ -44,7 +44,21 @@
   },
   "dota2": {
     "title": "Dota 2",
-    "description": "Все що пов'язано з Dota 2"
+    "description": "Все що пов'язано з Dota 2",
+    "random": "Рандом герой",
+    "randomDesc": "Випадковий герой з усього пулу",
+    "draft": "Сингл-драфт",
+    "draftDesc": "4 випадкові герої на вибір"
+  },
+  "randomHero": {
+    "title": "Рандом герой",
+    "description": "Випадковий герой з усього пулу",
+    "generate": "Рандом!"
+  },
+  "singleDraft": {
+    "title": "Сингл-драфт",
+    "description": "4 випадкові герої, обери одного",
+    "generate": "Новий драфт"
   },
   "headsOrTails": {
     "title": "Орел чи Решка",
