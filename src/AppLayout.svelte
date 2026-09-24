@@ -9,6 +9,7 @@
   import Randomizer from './pages/Randomizer.svelte'
   import Rust from './pages/Rust.svelte'
   import Minecraft from './pages/Minecraft.svelte'
+  import Dota2 from './pages/Dota2.svelte'
   import Vlogf from './pages/Vlogf.svelte'
   import Seido from './pages/Seido.svelte'
 
@@ -41,6 +42,8 @@
   <Rust />
 {:else if $location.pathname === '/games/minecraft'}
   <Minecraft />
+{:else if $location.pathname === '/games/dota2'}
+  <Dota2 />
 {:else if $location.pathname === '/vlogf'}
   <Vlogf />
 {:else if $location.pathname === '/seido'}

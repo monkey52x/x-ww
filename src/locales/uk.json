@@ -5,7 +5,8 @@
     "randomizer": "Рандомайзер",
     "headsOrTails": "Орел чи Решка",
     "rust": "Rust",
-    "minecraft": "Minecraft"
+    "minecraft": "Minecraft",
+    "dota2": "Dota 2"
   },
   "home": {
     "title": "x-ww",
@@ -40,6 +41,10 @@
   "minecraft": {
     "title": "Minecraft",
     "description": "Наші пригоди в Minecraft"
+  },
+  "dota2": {
+    "title": "Dota 2",
+    "description": "Все що пов'язано з Dota 2"
   },
   "headsOrTails": {
     "title": "Орел чи Решка",

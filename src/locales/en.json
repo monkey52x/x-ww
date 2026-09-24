@@ -5,7 +5,8 @@
     "randomizer": "Randomizer",
     "headsOrTails": "Heads or Tails",
     "rust": "Rust",
-    "minecraft": "Minecraft"
+    "minecraft": "Minecraft",
+    "dota2": "Dota 2"
   },
   "home": {
     "title": "x-ww",
@@ -40,6 +41,10 @@
   "minecraft": {
     "title": "Minecraft",
     "description": "Our adventures in Minecraft"
+  },
+  "dota2": {
+    "title": "Dota 2",
+    "description": "Everything related to Dota 2"
   },
   "headsOrTails": {
     "title": "Heads or Tails",
