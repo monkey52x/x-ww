@@ -4,11 +4,28 @@
   import { t } from '../i18n.js'
 
   const SIZE = 320
-  const MAX_OPTIONS = 20
   const COLORS = ['#7c3aed', '#ec4899', '#6d28d9', '#db2777', '#8b5cf6', '#f472b6']
   const DIM = 'rgba(255, 255, 255, 0.08)'
+  const STORE_KEY = 'xww-roulette-options'
+  const REPEAT = 8
 
-  let optionsText = ''
+  function loadOptions() {
+    try {
+      return localStorage.getItem(STORE_KEY) ?? ''
+    } catch {
+      return ''
+    }
+  }
+
+  function persistOptions(text) {
+    try {
+      localStorage.setItem(STORE_KEY, text)
+    } catch {
+      // private mode — options just won't persist
+    }
+  }
+
+  let optionsText = loadOptions()
   let spinning = false
   let winner = null
   let muted = false
@@ -16,24 +33,30 @@
   let rotation = 0
   let raf = 0
   let audioCtx = null
+  let lastTick = 0
+  let repeat = 1
 
   $: options = optionsText
     .split('\n')
     .map((s) => s.trim())
     .filter(Boolean)
-    .slice(0, MAX_OPTIONS)
-  $: canSpin = !spinning && options.length >= 2
-  $: if (canvas && options && !spinning) drawWheel()
+  $: sectors = options.flatMap((o) => Array(repeat).fill(o))
+  $: canSpin = !spinning && sectors.length >= 2
+  $: if (canvas && options && repeat && !spinning) drawWheel()
+  $: persistOptions(optionsText)
 
   function sectorAt(angle) {
     const TAU = Math.PI * 2
-    const arc = TAU / options.length
+    const arc = TAU / sectors.length
     const rel = ((((3 * Math.PI) / 2 - angle) % TAU) + TAU) % TAU
     return Math.floor(rel / arc) % options.length
   }
 
   function tick() {
     if (muted) return
+    const nowMs = performance.now()
+    if (nowMs - lastTick < 30) return
+    lastTick = nowMs
     try {
       if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
       if (audioCtx.state === 'suspended') audioCtx.resume()
@@ -58,8 +81,8 @@
     spinning = true
     winner = null
     const TAU = Math.PI * 2
-    const arc = TAU / options.length
-    const targetIndex = Math.floor(Math.random() * options.length)
+    const arc = TAU / sectors.length
+    const targetIndex = Math.floor(Math.random() * sectors.length)
     const targetAngle = -Math.PI / 2 - (targetIndex + 0.5) * arc
     const start = rotation
     const norm = (((targetAngle - start) % TAU) + TAU) % TAU
@@ -82,7 +105,7 @@
         raf = requestAnimationFrame(frame)
       } else {
         spinning = false
-        winner = options[targetIndex]
+        winner = sectors[targetIndex]
       }
     }
     raf = requestAnimationFrame(frame)
@@ -94,6 +117,14 @@
     const idx = lines.findIndex((l) => l.trim() === winner)
     if (idx >= 0) lines.splice(idx, 1)
     optionsText = lines.join('\n')
+    winner = null
+  }
+
+  function clearOptions() {
+    if (!optionsText.trim()) return
+    const ok = confirm(`${$t('roulette.clearConfirm')} (${options.length})`)
+    if (!ok) return
+    optionsText = ''
     winner = null
   }
 
@@ -110,9 +141,10 @@
     const TAU = Math.PI * 2
     ctx.clearRect(0, 0, SIZE, SIZE)
 
-    const dim = options.length < 2
-    const items = dim ? Array(8).fill('?') : options
+    const dim = sectors.length < 2
+    const items = dim ? Array(8).fill('?') : sectors
     const arc = TAU / items.length
+    const showLabels = !dim && arc > 0.12
 
     items.forEach((label, i) => {
       const a0 = rotation + i * arc
@@ -126,16 +158,18 @@
       ctx.lineWidth = 1
       ctx.stroke()
 
-      ctx.save()
-      ctx.translate(R, R)
-      ctx.rotate(a0 + arc / 2)
-      ctx.textAlign = 'right'
-      ctx.textBaseline = 'middle'
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
-      ctx.font = '700 13px system-ui, sans-serif'
-      const text = label.length > 16 ? label.slice(0, 15) + '…' : label
-      ctx.fillText(text, R - 18, 0)
-      ctx.restore()
+      if (showLabels) {
+        ctx.save()
+        ctx.translate(R, R)
+        ctx.rotate(a0 + arc / 2)
+        ctx.textAlign = 'right'
+        ctx.textBaseline = 'middle'
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)'
+        ctx.font = '700 13px system-ui, sans-serif'
+        const text = label.length > 16 ? label.slice(0, 15) + '…' : label
+        ctx.fillText(text, R - 18, 0)
+        ctx.restore()
+      }
     })
 
     // hub
@@ -201,12 +235,24 @@
         disabled={spinning}
         placeholder={$t('roulette.placeholder')}
       />
-      {#if options.length < 2}
+      {#if sectors.length < 2}
         <p class="roul-hint">{$t('roulette.needMore')}</p>
+      {:else if repeat > 1}
+        <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
           {spinning ? $t('roulette.spinning') : `🎡 ${$t('roulette.spin')}`}
+        </button>
+        <button
+          class="btn-glass btn-ghost"
+          class:repeat-active={repeat > 1}
+          on:click={() => (repeat = repeat > 1 ? 1 : REPEAT)}
+          disabled={spinning}
+          title={$t('roulette.repeatHint')}
+          aria-label={$t('roulette.repeat')}
+        >
+          ×{repeat > 1 ? REPEAT : 1}
         </button>
         <button
           class="btn-glass btn-ghost"
@@ -215,6 +261,15 @@
           aria-label={$t('roulette.sound')}
         >
           {muted ? '🔇' : '🔊'}
+        </button>
+        <button
+          class="btn-glass btn-ghost"
+          on:click={clearOptions}
+          disabled={spinning || !optionsText.trim()}
+          title={$t('roulette.clear')}
+          aria-label={$t('roulette.clear')}
+        >
+          🗑
         </button>
       </div>
     </div>
@@ -286,6 +341,12 @@
 
   .btn-ghost {
     padding: 12px 16px;
+  }
+
+  .repeat-active {
+    border-color: #4ade80;
+    box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
+    color: #4ade80;
   }
 
   .btn-glass:disabled {
