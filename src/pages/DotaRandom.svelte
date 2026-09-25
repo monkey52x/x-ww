@@ -9,13 +9,48 @@
   let hero = null
   let imgOk = true
   let showBans = false
+  let rollToken = 0
 
   $: isBanned = hero ? $banned.has(hero.key) : false
   $: available = HEROES.length - $banCount
 
+  function preload(key, onReady) {
+    const img = new Image()
+    img.onload = () => onReady(true)
+    img.onerror = () => onReady(false)
+    img.src = heroImg(key)
+  }
+
   function roll() {
-    hero = pickRandomHeroes(1, $banned)[0] ?? null
-    imgOk = true
+    let next = pickRandomHeroes(1, $banned)[0] ?? null
+    if (!next) {
+      hero = null
+      imgOk = true
+      return
+    }
+    // first paint or same hero twice — show instantly, nothing to wait for
+    if (!hero || next.key === hero.key) {
+      if (hero && next.key === hero.key) {
+        next = pickRandomHeroes(1, $banned)[0] ?? next
+        if (next.key === hero.key) return
+      }
+      hero = next
+      imgOk = true
+      return
+    }
+    // otherwise keep the current hero on screen until the new image is ready
+    const token = ++rollToken
+    preload(next.key, (ok) => {
+      if (token !== rollToken) return
+      hero = next
+      imgOk = ok
+      // warm the cache so the next roll is instant
+      const upcoming = pickRandomHeroes(1, $banned)[0]
+      if (upcoming && upcoming.key !== next.key) {
+        const warm = new Image()
+        warm.src = heroImg(upcoming.key)
+      }
+    })
   }
 
   function toggleBan() {
@@ -70,9 +105,7 @@
           </div>
           <div class="hero-name">{hero.name}</div>
           <div class="hero-attr attr-{hero.attr}">{$t(`attr.${hero.attr}`)}</div>
-          {#if isBanned}
-            <div class="banned-tag">🚫 {$t('bans.banned')}</div>
-          {/if}
+          <div class="banned-tag" class:tag-hidden={!isBanned}>🚫 {$t('bans.banned')}</div>
         </div>
       {/key}
     {:else}
@@ -230,6 +263,11 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--white-dim);
+    min-height: 1.2em;
+  }
+
+  .banned-tag.tag-hidden {
+    visibility: hidden;
   }
 
   .ban-empty {
