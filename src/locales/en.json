@@ -60,6 +60,20 @@
     "description": "4 random heroes, pick one",
     "generate": "New draft"
   },
+  "attr": {
+    "str": "Strength",
+    "agi": "Agility",
+    "int": "Intelligence",
+    "all": "Universal"
+  },
+  "bans": {
+    "button": "Bans",
+    "title": "Banned heroes",
+    "empty": "No banned heroes",
+    "clear": "Clear all",
+    "allBanned": "All heroes are banned — clear bans to roll",
+    "banned": "banned"
+  },
   "headsOrTails": {
     "title": "Heads or Tails",
     "description": "Flip a coin and find out",

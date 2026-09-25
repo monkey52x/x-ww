@@ -139,9 +139,10 @@ export const HEROES = [
   { key: 'largo', name: 'Largo', attr: 'str' },
 ]
 
-// Fisher-Yates partial shuffle: returns n unique heroes
-export function pickRandomHeroes(n) {
-  const pool = [...HEROES]
+// Fisher-Yates partial shuffle: returns n unique heroes,
+// skipping any keys present in `exclude` (e.g. banned heroes)
+export function pickRandomHeroes(n, exclude = new Set()) {
+  const pool = exclude.size ? HEROES.filter((h) => !exclude.has(h.key)) : [...HEROES]
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     ;[pool[i], pool[j]] = [pool[j], pool[i]]
