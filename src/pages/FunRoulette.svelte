@@ -8,6 +8,7 @@
   const DIM = 'rgba(255, 255, 255, 0.08)'
   const STORE_KEY = 'xww-roulette-options'
   const CROSSED_KEY = 'xww-roulette-crossed'
+  const MUTED_KEY = 'xww-roulette-muted'
   const REPEAT = 8
 
   function loadOptions() {
@@ -41,7 +42,7 @@
   let crossed = loadCrossed()
   let spinning = false
   let winner = null
-  let muted = false
+  let muted = loadMuted()
   let canvas = null
   let rotation = 0
   let raf = 0
@@ -59,6 +60,23 @@
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
+  $: persistMuted(muted)
+
+  function loadMuted() {
+    try {
+      return localStorage.getItem(MUTED_KEY) === '1'
+    } catch {
+      return false
+    }
+  }
+
+  function persistMuted(value) {
+    try {
+      localStorage.setItem(MUTED_KEY, value ? '1' : '0')
+    } catch {
+      // private mode — mute just won't persist
+    }
+  }
 
   function persistCrossed(set) {
     try {
@@ -333,7 +351,7 @@
 <style>
   .roul-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
     align-items: start;
   }
@@ -448,11 +466,13 @@
 
   .roul-wheel-card {
     align-items: center;
+    min-width: 0;
   }
 
   .wheel {
     width: 100%;
     max-width: 340px;
+    min-width: 0;
     height: auto;
     filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.5));
   }

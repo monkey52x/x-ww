@@ -92,7 +92,6 @@
   .settings-btn:hover {
     border-color: var(--purple-500);
     box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
-    transform: rotate(30deg);
   }
 
   .header-logo {
