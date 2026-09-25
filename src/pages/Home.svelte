@@ -27,8 +27,6 @@
       <span class="hl-emoji">😘</span>
       <span class="hl-ww">WW</span>
     </div>
-    <p class="home-subtitle">{$t('home.subtitle')}</p>
-    <p class="home-desc">{$t('home.description')}</p>
   </div>
 
   <div class="home-container">
@@ -63,7 +61,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
     padding: 110px 20px 40px;
   }
@@ -71,7 +69,7 @@
   .home-hero {
     text-align: center;
     position: relative;
-    padding: 30px 40px 10px;
+    padding: 10px 40px 10px;
   }
 
   .home-glow {
@@ -149,22 +147,6 @@
     50% { text-shadow: 0 0 20px rgba(124,58,237,0.8), 0 0 50px rgba(124,58,237,0.4), 0 0 80px rgba(236,72,153,0.2); }
   }
 
-  .home-subtitle {
-    font-size: 1.1rem;
-    color: var(--white-dim);
-    margin-bottom: 8px;
-    position: relative;
-  }
-
-  .home-desc {
-    font-size: 0.9rem;
-    color: var(--white-muted);
-    max-width: 460px;
-    margin: 0 auto;
-    position: relative;
-    line-height: 1.6;
-  }
-
   .home-container {
     display: flex;
     justify-content: center;
@@ -172,7 +154,7 @@
     gap: clamp(40px, 8vw, 120px);
     flex-wrap: wrap;
     max-width: 1600px;
-    margin-top: 32px;
+    margin-top: 24px;
   }
 
   .side-group {
@@ -262,12 +244,10 @@
   }
 
   @media (max-width: 768px) {
-    .home { padding: 100px 16px 30px; min-height: auto; }
+    .home { padding: 90px 16px 30px; min-height: auto; }
     .home-logo { font-size: 3rem; }
     :global(.hl-emoji) { font-size: 2.2rem; }
-    .home-subtitle { font-size: 0.95rem; }
-    .home-desc { font-size: 0.85rem; }
-    .home-hero { padding: 20px 16px 10px; }
+    .home-hero { padding: 10px 16px 10px; }
 
     .home-container {
       flex-direction: column;
