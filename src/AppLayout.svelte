@@ -7,6 +7,7 @@
   import Fun from './pages/Fun.svelte'
   import HeadsOrTails from './pages/HeadsOrTails.svelte'
   import Randomizer from './pages/Randomizer.svelte'
+  import FunRoulette from './pages/FunRoulette.svelte'
   import Rust from './pages/Rust.svelte'
   import Minecraft from './pages/Minecraft.svelte'
   import Dota2 from './pages/Dota2.svelte'
@@ -40,6 +41,8 @@
   <Randomizer />
 {:else if $location.pathname === '/fun/heads-or-tails'}
   <HeadsOrTails />
+{:else if $location.pathname === '/fun/roulette'}
+  <FunRoulette />
 {:else if $location.pathname === '/games/rust'}
   <Rust />
 {:else if $location.pathname === '/games/minecraft'}

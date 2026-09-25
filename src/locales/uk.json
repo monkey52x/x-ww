@@ -4,6 +4,7 @@
     "fun": "Приколи",
     "randomizer": "Рандомайзер",
     "headsOrTails": "Орел чи Решка",
+    "roulette": "Рулетка",
     "rust": "Rust",
     "minecraft": "Minecraft",
     "dota2": "Dota 2"
@@ -19,6 +20,7 @@
     "randomizer": "Рандомайзер",
     "randomizerDesc": "Випадкові штуки для розваги",
     "headsOrTailsDesc": "Підкинь монетку",
+    "rouletteDesc": "Колесо фортуни",
     "games": "Ігри"
   },
   "randomizer": {
@@ -57,6 +59,18 @@
     "title": "Рандом герой",
     "description": "Випадковий герой з усього пулу",
     "generate": "Рандом!"
+  },
+  "roulette": {
+    "title": "Рулетка",
+    "description": "Колесо фортуни — впиши варіанти і крути",
+    "options": "Варіанти",
+    "placeholder": "Впиши по одному варіанту на рядок (до 20)",
+    "needMore": "Додай мінімум 2 варіанти",
+    "spin": "Крутити!",
+    "spinning": "Крутиться…",
+    "winner": "Переможець",
+    "removeWinner": "Прибрати переможця",
+    "sound": "Звук"
   },
   "singleDraft": {
     "title": "Сингл-драфт",

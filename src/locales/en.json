@@ -4,6 +4,7 @@
     "fun": "Fun",
     "randomizer": "Randomizer",
     "headsOrTails": "Heads or Tails",
+    "roulette": "Roulette",
     "rust": "Rust",
     "minecraft": "Minecraft",
     "dota2": "Dota 2"
@@ -19,6 +20,7 @@
     "randomizer": "Randomizer",
     "randomizerDesc": "Random stuff for fun",
     "headsOrTailsDesc": "Flip a coin",
+    "rouletteDesc": "Wheel of fortune",
     "games": "Games"
   },
   "randomizer": {
@@ -57,6 +59,18 @@
     "title": "Random hero",
     "description": "A random hero from the full pool",
     "generate": "Random!"
+  },
+  "roulette": {
+    "title": "Roulette",
+    "description": "Wheel of fortune — enter options and spin",
+    "options": "Options",
+    "placeholder": "Enter one option per line (up to 20)",
+    "needMore": "Add at least 2 options",
+    "spin": "Spin!",
+    "spinning": "Spinning…",
+    "winner": "Winner",
+    "removeWinner": "Remove winner",
+    "sound": "Sound"
   },
   "singleDraft": {
     "title": "Single draft",
