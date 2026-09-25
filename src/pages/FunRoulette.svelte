@@ -7,6 +7,7 @@
   const COLORS = ['#7c3aed', '#ec4899', '#6d28d9', '#db2777', '#8b5cf6', '#f472b6']
   const DIM = 'rgba(255, 255, 255, 0.08)'
   const STORE_KEY = 'xww-roulette-options'
+  const CROSSED_KEY = 'xww-roulette-crossed'
   const REPEAT = 8
 
   function loadOptions() {
@@ -25,7 +26,19 @@
     }
   }
 
+  function loadCrossed() {
+    try {
+      const raw = localStorage.getItem(CROSSED_KEY)
+      if (!raw) return new Set()
+      const arr = JSON.parse(raw)
+      return new Set(Array.isArray(arr) ? arr.filter((x) => typeof x === 'string') : [])
+    } catch {
+      return new Set()
+    }
+  }
+
   let optionsText = loadOptions()
+  let crossed = loadCrossed()
   let spinning = false
   let winner = null
   let muted = false
@@ -40,16 +53,26 @@
     .split('\n')
     .map((s) => s.trim())
     .filter(Boolean)
-  $: sectors = options.flatMap((o) => Array(repeat).fill(o))
+  $: pool = options.filter((o) => !crossed.has(o))
+  $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
-  $: if (canvas && options && repeat && !spinning) drawWheel()
+  $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
+  $: persistCrossed(crossed)
+
+  function persistCrossed(set) {
+    try {
+      localStorage.setItem(CROSSED_KEY, JSON.stringify([...set]))
+    } catch {
+      // private mode — crossed just won't persist
+    }
+  }
 
   function sectorAt(angle) {
     const TAU = Math.PI * 2
     const arc = TAU / sectors.length
     const rel = ((((3 * Math.PI) / 2 - angle) % TAU) + TAU) % TAU
-    return Math.floor(rel / arc) % options.length
+    return Math.floor(rel / arc) % sectors.length
   }
 
   function tick() {
@@ -86,7 +109,8 @@
     const targetAngle = -Math.PI / 2 - (targetIndex + 0.5) * arc
     const start = rotation
     const norm = (((targetAngle - start) % TAU) + TAU) % TAU
-    const total = (5 + Math.random() * 3) * TAU + norm
+    const fullTurns = 5 + Math.floor(Math.random() * 4)
+    const total = fullTurns * TAU + norm
     const duration = 4500 + Math.random() * 1500
     const t0 = performance.now()
     let lastSector = sectorAt(start)
@@ -105,18 +129,23 @@
         raf = requestAnimationFrame(frame)
       } else {
         spinning = false
-        winner = sectors[targetIndex]
+        // winner is whatever the pointer actually points at — by construction
+        winner = sectors[sectorAt(rotation)] ?? sectors[targetIndex]
       }
     }
     raf = requestAnimationFrame(frame)
   }
 
-  function removeWinner() {
+  function toggleCross(value) {
+    const next = new Set(crossed)
+    if (next.has(value)) next.delete(value)
+    else next.add(value)
+    crossed = next
+  }
+
+  function strikeWinner() {
     if (!winner) return
-    const lines = optionsText.split('\n')
-    const idx = lines.findIndex((l) => l.trim() === winner)
-    if (idx >= 0) lines.splice(idx, 1)
-    optionsText = lines.join('\n')
+    crossed = new Set(crossed).add(winner)
     winner = null
   }
 
@@ -125,6 +154,7 @@
     const ok = confirm(`${$t('roulette.clearConfirm')} (${options.length})`)
     if (!ok) return
     optionsText = ''
+    crossed = new Set()
     winner = null
   }
 
@@ -219,8 +249,8 @@
     <div class="glass winner-box">
       <span class="winner-trophy">🏆</span>
       <span class="winner-name">{winner}</span>
-      <button class="btn-glass btn-sm" on:click={removeWinner}>
-        ❌ {$t('roulette.removeWinner')}
+      <button class="btn-glass btn-sm" on:click={strikeWinner}>
+        {$t('roulette.strikeWinner')}
       </button>
     </div>
   {/if}
@@ -235,10 +265,27 @@
         disabled={spinning}
         placeholder={$t('roulette.placeholder')}
       />
-      {#if sectors.length < 2}
-        <p class="roul-hint">{$t('roulette.needMore')}</p>
+      {#if pool.length < 2}
+        <p class="roul-hint">
+          {options.length >= 2 ? $t('roulette.uncrossHint') : $t('roulette.needMore')}
+        </p>
       {:else if repeat > 1}
         <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
+      {/if}
+      {#if options.length}
+        <p class="roul-hint">{$t('roulette.tapToCross')}</p>
+        <div class="chip-list">
+          {#each options as opt, idx (idx)}
+            <button
+              class="chip"
+              class:crossed={crossed.has(opt)}
+              on:click={() => toggleCross(opt)}
+              disabled={spinning}
+            >
+              {opt}
+            </button>
+          {/each}
+        </div>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
@@ -331,6 +378,47 @@
   .roul-hint {
     font-size: 0.8rem;
     color: var(--white-muted);
+  }
+
+  .chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-height: 132px;
+    overflow-y: auto;
+  }
+
+  .chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-glass);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all var(--transition);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chip:hover:not(:disabled) {
+    border-color: var(--purple-500);
+  }
+
+  .chip:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .chip.crossed {
+    text-decoration: line-through;
+    opacity: 0.45;
+    border-color: rgba(248, 113, 113, 0.5);
+    color: var(--white-dim);
   }
 
   .btn-row {
