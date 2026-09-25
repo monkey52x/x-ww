@@ -119,7 +119,12 @@
     flex-direction: column;
     align-items: center;
     gap: 10px;
-    animation: fadeIn 0.4s ease;
+    animation: heroFade 0.25s ease;
+  }
+
+  @keyframes heroFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .img-wrap {
