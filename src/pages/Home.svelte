@@ -3,7 +3,7 @@
 
   const games = [
     { to: '/games/rust', img: '/images/Rust2.png', key: 'rust' },
-    { to: '/games/minecraft', img: '/images/Minecraft.png', key: 'minecraft' },
+    // hidden for now: { to: '/games/minecraft', img: '/images/Minecraft.png', key: 'minecraft' },
     { to: '/games/dota2', img: '/images/Dota2.png', key: 'dota2' },
   ]
 

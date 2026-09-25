@@ -36,7 +36,10 @@
   },
   "rust": {
     "title": "Rust",
-    "description": "Everything related to Rust"
+    "description": "Everything related to Rust",
+    "linkTitle": "RustHelp",
+    "linkDesc": "Guides, crafting and help for Rust",
+    "linkButton": "Open RustHelp"
   },
   "minecraft": {
     "title": "Minecraft",

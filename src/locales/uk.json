@@ -36,7 +36,10 @@
   },
   "rust": {
     "title": "Rust",
-    "description": "Все що пов'язано з Rust"
+    "description": "Все що пов'язано з Rust",
+    "linkTitle": "RustHelp",
+    "linkDesc": "Гайди, крафти та допомога по Rust",
+    "linkButton": "Відкрити RustHelp"
   },
   "minecraft": {
     "title": "Minecraft",
