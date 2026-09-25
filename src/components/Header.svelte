@@ -1,9 +1,10 @@
 <script>
   import { navigate, useLocation } from 'svelte-routing'
   import { t } from '../i18n.js'
-  import LanguageSwitcher from './LanguageSwitcher.svelte'
+  import SettingsModal from './SettingsModal.svelte'
 
   const location = useLocation()
+  let settingsOpen = false
 
   function goTo(path, e) {
     e.preventDefault()
@@ -36,9 +37,18 @@
         {$t('nav.fun')}
       </a>
     </nav>
-    <LanguageSwitcher />
+    <button
+      class="settings-btn"
+      on:click={() => (settingsOpen = true)}
+      title={$t('settings.title')}
+      aria-label={$t('settings.title')}
+    >
+      ⚙
+    </button>
   </div>
 </header>
+
+<SettingsModal open={settingsOpen} onClose={() => (settingsOpen = false)} />
 
 <style>
   .header {
@@ -59,6 +69,30 @@
     justify-content: space-between;
     height: 60px;
     gap: 16px;
+  }
+
+  .settings-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--white);
+    font-size: 1.1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+
+  .settings-btn:hover {
+    border-color: var(--purple-500);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+    transform: rotate(30deg);
   }
 
   .header-logo {

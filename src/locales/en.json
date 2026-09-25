@@ -105,5 +105,8 @@
     "retry": "Again"
   },
   "back": "Back",
-  "language": "Language"
+  "language": "Language",
+  "settings": {
+    "title": "Settings"
+  }
 }
