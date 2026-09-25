@@ -106,7 +106,10 @@
     const TAU = Math.PI * 2
     const arc = TAU / sectors.length
     const targetIndex = Math.floor(Math.random() * sectors.length)
-    const targetAngle = -Math.PI / 2 - (targetIndex + 0.5) * arc
+    // land at a random spot inside the sector (not dead center), with edge margin
+    const EDGE = 0.18
+    const spot = EDGE + Math.random() * (1 - 2 * EDGE)
+    const targetAngle = -Math.PI / 2 - (targetIndex + spot) * arc
     const start = rotation
     const norm = (((targetAngle - start) % TAU) + TAU) % TAU
     const fullTurns = 5 + Math.floor(Math.random() * 4)
@@ -214,7 +217,7 @@
     ctx.font = '20px serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(spinning ? '…' : '🎡', R, R + 1)
+    ctx.fillText('🎡', R, R + 1)
 
     // pointer
     ctx.beginPath()
