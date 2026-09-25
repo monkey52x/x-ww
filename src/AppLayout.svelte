@@ -2,7 +2,7 @@
   import { useLocation } from 'svelte-routing'
   import { onMount } from 'svelte'
   import Header from './components/Header.svelte'
-  import Footer from './components/Footer.svelte'
+  // footer hidden for now: import Footer from './components/Footer.svelte'
   import Home from './pages/Home.svelte'
   import Fun from './pages/Fun.svelte'
   import HeadsOrTails from './pages/HeadsOrTails.svelte'
@@ -59,6 +59,8 @@
   <Seido />
 {/if}
 
+<!-- footer hidden for now
 {#if !BIO_PATHS.includes($location.pathname)}
   <Footer />
 {/if}
+-->
