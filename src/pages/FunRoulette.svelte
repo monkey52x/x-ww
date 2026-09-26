@@ -9,6 +9,7 @@
   const STORE_KEY = 'xww-roulette-options'
   const CROSSED_KEY = 'xww-roulette-crossed'
   const MUTED_KEY = 'xww-roulette-muted'
+  const BLOCK_KEY = 'xww-roulette-block'
   const REPEAT = 8
 
   function loadOptions() {
@@ -43,6 +44,7 @@
   let spinning = false
   let winner = null
   let muted = loadMuted()
+  let blockMode = loadBlock()
   let canvas = null
   let rotation = 0
   let raf = 0
@@ -57,10 +59,30 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
+  $: crossedCount = options.filter((o) => crossed.has(o)).length
+  $: lines = optionsText ? optionsText.split('\n') : []
+  $: editRows = lines.length && lines[lines.length - 1] === '' ? lines : [...lines, '']
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
   $: persistMuted(muted)
+  $: persistBlock(blockMode)
+
+  function loadBlock() {
+    try {
+      return localStorage.getItem(BLOCK_KEY) === '1'
+    } catch {
+      return false
+    }
+  }
+
+  function persistBlock(value) {
+    try {
+      localStorage.setItem(BLOCK_KEY, value ? '1' : '0')
+    } catch {
+      // private mode — block mode just won't persist
+    }
+  }
 
   function loadMuted() {
     try {
@@ -158,10 +180,26 @@
   }
 
   function toggleCross(value) {
+    const v = value.trim()
+    if (!v) return
     const next = new Set(crossed)
-    if (next.has(value)) next.delete(value)
-    else next.add(value)
+    if (next.has(v)) next.delete(v)
+    else next.add(v)
     crossed = next
+  }
+
+  function rowInput(i, val) {
+    const arr = optionsText ? optionsText.split('\n') : []
+    if (i < arr.length) arr[i] = val
+    else arr.push(val)
+    optionsText = arr.join('\n')
+  }
+
+  function rowKey(e) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    const next = e.currentTarget.closest('.edit-row')?.nextElementSibling?.querySelector('input[type="text"]')
+    if (next) next.focus()
   }
 
   function strikeWinner() {
@@ -279,34 +317,49 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      <textarea
-        class="roul-textarea"
-        rows={6}
-        bind:value={optionsText}
-        disabled={spinning}
-        placeholder={$t('roulette.placeholder')}
-      />
+      {#if blockMode}
+        <div class="edit-list">
+          {#each editRows as row, i (i)}
+            {@const v = row.trim()}
+            {@const isCrossed = v !== '' && crossed.has(v)}
+            <div class="edit-row">
+              <input
+                type="checkbox"
+                class="edit-check"
+                checked={isCrossed}
+                disabled={spinning || v === ''}
+                on:change={() => toggleCross(v)}
+                aria-label="block"
+              />
+              <input
+                type="text"
+                class="edit-input"
+                class:blocked={isCrossed}
+                value={row}
+                disabled={spinning}
+                on:input={(e) => rowInput(i, e.currentTarget.value)}
+                on:keydown={rowKey}
+              />
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <textarea
+          class="roul-textarea"
+          rows={6}
+          bind:value={optionsText}
+          disabled={spinning}
+          placeholder={$t('roulette.placeholder')}
+        />
+      {/if}
       {#if pool.length < 2}
         <p class="roul-hint">
-          {options.length >= 2 ? $t('roulette.uncrossHint') : $t('roulette.needMore')}
+          {options.length >= 2 ? $t('roulette.enableBlockHint') : $t('roulette.needMore')}
         </p>
       {:else if repeat > 1}
         <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
-      {/if}
-      {#if options.length}
-        <p class="roul-hint">{$t('roulette.tapToCross')}</p>
-        <div class="chip-list">
-          {#each options as opt, idx (idx)}
-            <button
-              class="chip"
-              class:crossed={crossed.has(opt)}
-              on:click={() => toggleCross(opt)}
-              disabled={spinning}
-            >
-              {opt}
-            </button>
-          {/each}
-        </div>
+      {:else if !blockMode && crossedCount > 0}
+        <p class="roul-hint">🚫 {$t('roulette.blocked')}: {crossedCount}</p>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
@@ -321,6 +374,16 @@
           aria-label={$t('roulette.repeat')}
         >
           ×{repeat > 1 ? REPEAT : 1}
+        </button>
+        <button
+          class="btn-glass btn-ghost"
+          class:repeat-active={blockMode}
+          on:click={() => (blockMode = !blockMode)}
+          disabled={spinning}
+          title={$t('roulette.block')}
+          aria-label={$t('roulette.block')}
+        >
+          🔒
         </button>
         <button
           class="btn-glass btn-ghost"
@@ -401,45 +464,53 @@
     color: var(--white-muted);
   }
 
-  .chip-list {
+  .edit-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 132px;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
     overflow-y: auto;
   }
 
-  .chip {
-    padding: 6px 12px;
-    border-radius: 999px;
-    border: 1px solid var(--border-glass);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--white);
-    font-size: 0.8rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    transition: all var(--transition);
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .edit-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
-  .chip:hover:not(:disabled) {
+  .edit-check {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: #7c3aed;
+    cursor: pointer;
+  }
+
+  .edit-input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--white);
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color var(--transition);
+  }
+
+  .edit-input:focus {
     border-color: var(--purple-500);
   }
 
-  .chip:disabled {
+  .edit-input:disabled {
     opacity: 0.6;
-    cursor: not-allowed;
   }
 
-  .chip.crossed {
+  .edit-input.blocked {
     text-decoration: line-through;
     opacity: 0.45;
-    border-color: rgba(248, 113, 113, 0.5);
-    color: var(--white-dim);
   }
 
   .btn-row {
