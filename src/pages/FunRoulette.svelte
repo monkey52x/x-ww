@@ -59,7 +59,6 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
-  $: crossedCount = options.filter((o) => crossed.has(o)).length
   $: lines = optionsText ? optionsText.split('\n') : []
   $: editRows = lines.length && lines[lines.length - 1] === '' ? lines : [...lines, '']
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
@@ -207,6 +206,20 @@
     if (next) next.focus()
   }
 
+  function rowPaste(i, e) {
+    const text = e.clipboardData?.getData('text') ?? ''
+    if (!text.includes('\n')) return
+    e.preventDefault()
+    const pasted = text
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (!pasted.length) return
+    const arr = optionsText ? optionsText.split('\n') : []
+    arr.splice(i, 0, ...pasted)
+    optionsText = arr.join('\n')
+  }
+
   function strikeWinner() {
     if (!winner) return
     crossed = new Set(crossed).add(winner)
@@ -322,12 +335,12 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      {#if blockMode}
-        <div class="edit-list">
-          {#each editRows as row, i (i)}
-            {@const v = row.trim()}
-            {@const isCrossed = v !== '' && crossed.has(v)}
-            <div class="edit-row">
+      <div class="edit-list">
+        {#each editRows as row, i}
+          {@const v = row.trim()}
+          {@const isCrossed = v !== '' && crossed.has(v)}
+          <div class="edit-row">
+            {#if blockMode}
               <input
                 type="checkbox"
                 class="edit-check"
@@ -336,35 +349,26 @@
                 on:change={() => toggleCross(v)}
                 aria-label="block"
               />
-              <input
-                type="text"
-                class="edit-input"
-                class:blocked={isCrossed}
-                value={row}
-                disabled={spinning}
-                on:input={(e) => rowInput(i, e.currentTarget.value)}
-                on:keydown={rowKey}
-              />
-            </div>
-          {/each}
-        </div>
-      {:else}
-        <textarea
-          class="roul-textarea"
-          rows={6}
-          bind:value={optionsText}
-          disabled={spinning}
-          placeholder={$t('roulette.placeholder')}
-        />
-      {/if}
+            {/if}
+            <input
+              type="text"
+              class="edit-input"
+              class:blocked={isCrossed}
+              value={row}
+              disabled={spinning}
+              on:input={(e) => rowInput(i, e.currentTarget.value)}
+              on:keydown={rowKey}
+              on:paste={(e) => rowPaste(i, e)}
+            />
+          </div>
+        {/each}
+      </div>
       {#if pool.length < 2}
         <p class="roul-hint">
           {options.length >= 2 ? $t('roulette.enableBlockHint') : $t('roulette.needMore')}
         </p>
       {:else if repeat > 1}
         <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
-      {:else if !blockMode && crossedCount > 0}
-        <p class="roul-hint">🚫 {$t('roulette.blocked')}: {crossedCount}</p>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
@@ -436,37 +440,6 @@
     font-size: 1.15rem;
     font-weight: 700;
     color: var(--white);
-  }
-
-  .roul-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-glass);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--white);
-    font-size: 0.9rem;
-    font-family: inherit;
-    outline: none;
-    resize: vertical;
-    transition: border-color var(--transition);
-  }
-
-  .roul-textarea:focus {
-    border-color: var(--purple-500);
-  }
-
-  .roul-textarea::placeholder {
-    color: var(--white-muted);
-  }
-
-  .roul-textarea:disabled {
-    opacity: 0.6;
-  }
-
-  .roul-hint {
-    font-size: 0.8rem;
-    color: var(--white-muted);
   }
 
   .edit-list {
