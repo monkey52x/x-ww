@@ -72,6 +72,8 @@
     "done": "Done",
     "hide": "Hide",
     "reset": "Reset",
+    "trim": "Remove gaps",
+    "trimConfirm": "Delete all blank lines? This cannot be undone.",
     "enableBlockHint": "All options are blocked",
     "sound": "Sound",
     "repeat": "Repeat each option 8 times",

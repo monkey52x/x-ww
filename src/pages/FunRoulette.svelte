@@ -59,6 +59,8 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
+  $: rawLines = optionsText ? optionsText.split('\n') : []
+  $: hasGaps = options.length > 0 && rawLines.some((l) => !l.trim())
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -175,6 +177,16 @@
 
   function resetCrossed() {
     crossed = new Set()
+  }
+
+  function trimGaps() {
+    const all = optionsText.split('\n')
+    const kept = all.filter((l) => l.trim())
+    if (!kept.length) return
+    const removed = all.length - kept.length
+    const ok = confirm(`${$t('roulette.trimConfirm')} (${removed})`)
+    if (!ok) return
+    optionsText = kept.join('\n')
   }
 
   let slotEl = null
@@ -315,17 +327,18 @@
       {:else if options.length}
         {#if mode === 'strike'}
           <div class="names names-strike">
-            {#each options as opt, i (i)}
+            {#each rawLines as line, i (i)}
+              {@const v = line.trim()}
               <div>
                 <div>
                   <label>
                     <input
                       type="checkbox"
-                      checked={crossed.has(opt)}
-                      disabled={spinning}
-                      on:change={() => toggleCross(opt)}
+                      checked={v !== '' && crossed.has(v)}
+                      disabled={spinning || v === ''}
+                      on:change={() => toggleCross(v)}
                     />
-                    <span class:strike={crossed.has(opt)}>{opt}</span>
+                    <span class:strike={v !== '' && crossed.has(v)}>{line}</span>
                   </label>
                 </div>
               </div>
@@ -340,8 +353,8 @@
             on:click={() => { if (!spinning) mode = 'edit' }}
             on:keydown={(e) => { if (!spinning && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); mode = 'edit' } }}
           >
-            {#each options as opt, i (i)}
-              <div class:strike={crossed.has(opt)}>{opt}</div>
+            {#each rawLines as line, i (i)}
+              <div class:strike={line.trim() !== '' && crossed.has(line.trim())}>{line}</div>
             {/each}
           </div>
         {/if}
@@ -368,6 +381,11 @@
         {#if crossed.size}
           <button class="btn-glass btn-sm" on:click={resetCrossed} disabled={spinning}>
             ↩ {$t('roulette.reset')}
+          </button>
+        {/if}
+        {#if hasGaps}
+          <button class="btn-glass btn-sm" on:click={trimGaps} disabled={spinning}>
+            🧹 {$t('roulette.trim')}
           </button>
         {/if}
       </div>
