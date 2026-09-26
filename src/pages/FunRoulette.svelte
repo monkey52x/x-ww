@@ -59,8 +59,8 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
-  $: lines = optionsText ? optionsText.split('\n') : []
-  $: editRows = lines.length && lines[lines.length - 1] === '' ? lines : [...lines, '']
+  $: crossedCount = options.filter((o) => crossed.has(o)).length
+  $: rawLines = optionsText ? optionsText.split('\n') : []
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -192,32 +192,10 @@
     crossed = next
   }
 
-  function rowInput(i, val) {
-    const arr = optionsText ? optionsText.split('\n') : []
-    if (i < arr.length) arr[i] = val
-    else arr.push(val)
-    optionsText = arr.join('\n')
-  }
+  let gutterEl = null
 
-  function rowKey(e) {
-    if (e.key !== 'Enter') return
-    e.preventDefault()
-    const next = e.currentTarget.closest('.edit-row')?.nextElementSibling?.querySelector('input[type="text"]')
-    if (next) next.focus()
-  }
-
-  function rowPaste(i, e) {
-    const text = e.clipboardData?.getData('text') ?? ''
-    if (!text.includes('\n')) return
-    e.preventDefault()
-    const pasted = text
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean)
-    if (!pasted.length) return
-    const arr = optionsText ? optionsText.split('\n') : []
-    arr.splice(i, 0, ...pasted)
-    optionsText = arr.join('\n')
+  function syncGutter(e) {
+    if (gutterEl) gutterEl.scrollTop = e.currentTarget.scrollTop
   }
 
   function strikeWinner() {
@@ -335,33 +313,32 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      <div class="edit-list">
-        {#each editRows as row, i}
-          {@const v = row.trim()}
-          {@const isCrossed = v !== '' && crossed.has(v)}
-          <div class="edit-row">
-            {#if blockMode}
-              <input
-                type="checkbox"
-                class="edit-check"
-                checked={isCrossed}
-                disabled={spinning || v === ''}
-                on:change={() => toggleCross(v)}
-                aria-label="block"
-              />
-            {/if}
-            <input
-              type="text"
-              class="edit-input"
-              class:blocked={isCrossed}
-              value={row}
-              disabled={spinning}
-              on:input={(e) => rowInput(i, e.currentTarget.value)}
-              on:keydown={rowKey}
-              on:paste={(e) => rowPaste(i, e)}
-            />
+      <div class="input-wrap">
+        {#if blockMode}
+          <div class="lock-gutter" bind:this={gutterEl}>
+            {#each rawLines as line}
+              {@const v = line.trim()}
+              <div class="lock-cell">
+                <input
+                  type="checkbox"
+                  checked={v !== '' && crossed.has(v)}
+                  disabled={spinning || v === ''}
+                  on:change={() => toggleCross(v)}
+                  aria-label="block"
+                />
+              </div>
+            {/each}
           </div>
-        {/each}
+        {/if}
+        <textarea
+          class="roul-textarea"
+          rows={6}
+          wrap="off"
+          bind:value={optionsText}
+          disabled={spinning}
+          on:scroll={syncGutter}
+          placeholder={$t('roulette.placeholder')}
+        />
       </div>
       {#if pool.length < 2}
         <p class="roul-hint">
@@ -369,6 +346,8 @@
         </p>
       {:else if repeat > 1}
         <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
+      {:else if crossedCount > 0}
+        <p class="roul-hint">🚫 {$t('roulette.blocked')}: {crossedCount}</p>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
@@ -442,53 +421,61 @@
     color: var(--white);
   }
 
-  .edit-list {
+  .input-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .lock-gutter {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    max-height: 220px;
-    overflow-y: auto;
+    padding-top: 11px;
+    overflow: hidden;
+    flex-shrink: 0;
   }
 
-  .edit-row {
+  .lock-cell {
+    height: 28px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
   }
 
-  .edit-check {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
+  .lock-cell input {
+    width: 17px;
+    height: 17px;
+    margin: 0;
     accent-color: #7c3aed;
     cursor: pointer;
   }
 
-  .edit-input {
+  .roul-textarea {
     flex: 1;
     min-width: 0;
-    padding: 8px 10px;
+    padding: 10px 12px;
     border: 1px solid var(--border-glass);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--white);
     font-size: 0.9rem;
+    line-height: 28px;
     font-family: inherit;
     outline: none;
+    resize: vertical;
     transition: border-color var(--transition);
   }
 
-  .edit-input:focus {
+  .roul-textarea:focus {
     border-color: var(--purple-500);
   }
 
-  .edit-input:disabled {
-    opacity: 0.6;
+  .roul-textarea::placeholder {
+    color: var(--white-muted);
   }
 
-  .edit-input.blocked {
-    text-decoration: line-through;
-    opacity: 0.45;
+  .roul-textarea:disabled {
+    opacity: 0.6;
   }
 
   .btn-row {
