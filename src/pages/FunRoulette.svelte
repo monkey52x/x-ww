@@ -58,6 +58,8 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
+  $: lines = optionsText ? optionsText.split('\n') : []
+  $: editRows = lines.length && lines[lines.length - 1] === '' ? lines : [...lines, '']
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -170,6 +172,34 @@
     if (next.has(v)) next.delete(v)
     else next.add(v)
     crossed = next
+  }
+
+  function rowInput(i, val) {
+    const arr = optionsText ? optionsText.split('\n') : []
+    if (i < arr.length) arr[i] = val
+    else arr.push(val)
+    optionsText = arr.join('\n')
+  }
+
+  function rowKey(e) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    const next = e.currentTarget.closest('.field-row')?.nextElementSibling?.querySelector('input[type="text"]')
+    if (next) next.focus()
+  }
+
+  function rowPaste(i, e) {
+    const text = e.clipboardData?.getData('text') ?? ''
+    if (!text.includes('\n')) return
+    e.preventDefault()
+    const pasted = text
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
+    if (!pasted.length) return
+    const arr = optionsText ? optionsText.split('\n') : []
+    arr.splice(i, 0, ...pasted)
+    optionsText = arr.join('\n')
   }
 
   function strikeWinner() {
@@ -287,40 +317,34 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      <textarea
-        class="roul-textarea"
-        rows={6}
-        bind:value={optionsText}
-        disabled={spinning}
-        placeholder={$t('roulette.placeholder')}
-      />
-      {#if options.length}
-        {#if blockMode}
-          <div class="names names-strike">
-            {#each options as opt, i (i)}
-              <div>
-                <div>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={crossed.has(opt)}
-                      disabled={spinning}
-                      on:change={() => toggleCross(opt)}
-                    />
-                    <span class:strike={crossed.has(opt)}>{opt}</span>
-                  </label>
-                </div>
-              </div>
-            {/each}
+      <div class="field-list">
+        {#each editRows as row, i}
+          {@const v = row.trim()}
+          {@const isCrossed = v !== '' && crossed.has(v)}
+          <div class="field-row">
+            {#if blockMode}
+              <input
+                type="checkbox"
+                class="field-check"
+                checked={isCrossed}
+                disabled={spinning || v === ''}
+                on:change={() => toggleCross(v)}
+                aria-label="block"
+              />
+            {/if}
+            <input
+              type="text"
+              class="field-input"
+              class:crossed={isCrossed}
+              value={row}
+              disabled={spinning}
+              on:input={(e) => rowInput(i, e.currentTarget.value)}
+              on:keydown={rowKey}
+              on:paste={(e) => rowPaste(i, e)}
+            />
           </div>
-        {:else}
-          <div class="names names-show">
-            {#each options as opt, i (i)}
-              <div class:strike={crossed.has(opt)}>{opt}</div>
-            {/each}
-          </div>
-        {/if}
-      {/if}
+        {/each}
+      </div>
       {#if pool.length < 2}
         <p class="roul-hint">
           {options.length >= 2 ? $t('roulette.enableBlockHint') : $t('roulette.needMore')}
@@ -400,67 +424,68 @@
     color: var(--white);
   }
 
-  .names {
+  .field-list {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-height: 180px;
+    min-height: 150px;
+    max-height: 220px;
     overflow-y: auto;
     padding: 10px 12px;
     border: 1px solid var(--border-glass);
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    font-size: 0.9rem;
-    color: var(--white);
+    background: rgba(255, 255, 255, 0.05);
+    resize: vertical;
   }
 
-  .names .strike {
-    text-decoration: line-through;
-    opacity: 0.45;
+  .field-list:focus-within {
+    border-color: var(--purple-500);
   }
 
-  .names-strike label {
+  .field-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    cursor: pointer;
-    padding: 2px 0;
   }
 
-  .names-strike input[type='checkbox'] {
-    width: 16px;
-    height: 16px;
+  .field-check {
+    width: 17px;
+    height: 17px;
     margin: 0;
     flex-shrink: 0;
     accent-color: #7c3aed;
     cursor: pointer;
   }
 
-  .roul-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-glass);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+  .field-input {
+    flex: 1;
+    min-width: 0;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
     color: var(--white);
     font-size: 0.9rem;
     line-height: 1.6;
     font-family: inherit;
     outline: none;
-    resize: vertical;
-    transition: border-color var(--transition);
   }
 
-  .roul-textarea:focus {
-    border-color: var(--purple-500);
+  .field-input:hover {
+    background: rgba(255, 255, 255, 0.04);
   }
 
-  .roul-textarea::placeholder {
-    color: var(--white-muted);
+  .field-input:focus {
+    background: rgba(124, 58, 237, 0.12);
   }
 
-  .roul-textarea:disabled {
+  .field-input:disabled {
     opacity: 0.6;
+  }
+
+  .field-input.crossed {
+    text-decoration: line-through;
+    opacity: 0.45;
   }
 
   .btn-row {
