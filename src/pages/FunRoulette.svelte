@@ -177,6 +177,13 @@
     crossed = new Set()
   }
 
+  let slotEl = null
+
+  function handleOutside(e) {
+    if (mode !== 'edit' && mode !== 'strike') return
+    if (slotEl && !slotEl.contains(e.target)) mode = 'show'
+  }
+
   function strikeWinner() {
     if (!winner) return
     crossed = new Set(crossed).add(winner)
@@ -265,7 +272,11 @@
     navigate(path)
   }
 
-  onMount(drawWheel)
+  onMount(() => {
+    drawWheel()
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  })
   onDestroy(() => {
     cancelAnimationFrame(raf)
     if (audioCtx) audioCtx.close().catch(() => {})
@@ -292,10 +303,11 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
+      <div class="slot-wrap" bind:this={slotEl}>
       {#if mode === 'edit'}
         <textarea
           class="roul-textarea"
-          rows={6}
+          rows={Math.min(Math.max(options.length, 1), 8)}
           bind:value={optionsText}
           disabled={spinning}
           placeholder={$t('roulette.placeholder')}
@@ -320,7 +332,14 @@
             {/each}
           </div>
         {:else}
-          <div class="names names-show">
+          <div
+            class="names names-show names-clickable"
+            role="button"
+            tabindex="0"
+            title={$t('roulette.edit')}
+            on:click={() => { if (!spinning) mode = 'edit' }}
+            on:keydown={(e) => { if (!spinning && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); mode = 'edit' } }}
+          >
             {#each options as opt, i (i)}
               <div class:strike={crossed.has(opt)}>{opt}</div>
             {/each}
@@ -351,6 +370,7 @@
             ↩ {$t('roulette.reset')}
           </button>
         {/if}
+      </div>
       </div>
       {#if pool.length < 2}
         <p class="roul-hint">
@@ -421,6 +441,12 @@
     color: var(--white);
   }
 
+  .slot-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
   .roul-textarea {
     width: 100%;
     padding: 10px 12px;
@@ -429,7 +455,7 @@
     background: rgba(255, 255, 255, 0.05);
     color: var(--white);
     font-size: 0.9rem;
-    line-height: 1.6;
+    line-height: 28px;
     font-family: inherit;
     outline: none;
     resize: vertical;
@@ -451,14 +477,14 @@
   .names {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    max-height: 180px;
+    max-height: 246px;
     overflow-y: auto;
     padding: 10px 12px;
     border: 1px solid var(--border-glass);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.03);
     font-size: 0.9rem;
+    font-family: inherit;
     color: var(--white);
   }
 
@@ -467,12 +493,25 @@
     opacity: 0.45;
   }
 
+  .names-show > div {
+    line-height: 28px;
+  }
+
+  .names-clickable {
+    cursor: pointer;
+  }
+
+  .names-clickable:focus-visible {
+    outline: none;
+    border-color: var(--purple-500);
+  }
+
   .names-strike label {
     display: flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    padding: 2px 0;
+    line-height: 28px;
   }
 
   .names-strike input[type='checkbox'] {
