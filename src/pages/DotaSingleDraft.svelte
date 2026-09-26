@@ -180,8 +180,6 @@
     border-radius: 8px;
     border: 1px solid var(--border-glass);
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     color: var(--white-dim);
     font-size: 0.9rem;
     font-weight: 800;

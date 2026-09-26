@@ -82,9 +82,9 @@ button {
   justify-content: center;
   gap: 8px;
   padding: 12px 28px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(236, 72, 153, 0.2));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* no backdrop-filter here: buttons live inside blurred .glass boxes,
+     nested blur + hover repaint paints a stripe band in Chromium */
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.35), rgba(236, 72, 153, 0.25));
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-sm);
   color: var(--white);

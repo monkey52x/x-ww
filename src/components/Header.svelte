@@ -63,6 +63,14 @@
     border-radius: 20px;
   }
 
+  /* keep the header static: .glass:hover repaints its blur layer and
+     flashes a seam band in Chromium when hovering anything inside */
+  .header.glass:hover {
+    background: var(--bg-card);
+    border-color: var(--border-glass);
+    box-shadow: var(--shadow-glass);
+  }
+
   .header-inner {
     display: flex;
     align-items: center;
@@ -80,8 +88,6 @@
     border: 1px solid var(--border-glass);
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     color: var(--white);
     font-size: 1.1rem;
     cursor: pointer;
