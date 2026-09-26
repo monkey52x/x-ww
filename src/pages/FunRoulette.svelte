@@ -58,6 +58,7 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
+  $: crossedCount = options.filter((o) => crossed.has(o)).length
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -287,15 +288,8 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      <textarea
-        class="roul-textarea"
-        rows={6}
-        bind:value={optionsText}
-        disabled={spinning}
-        placeholder={$t('roulette.placeholder')}
-      />
-      {#if options.length}
-        {#if blockMode}
+      {#if blockMode}
+        {#if options.length}
           <div class="names names-strike">
             {#each options as opt, i (i)}
               <div>
@@ -313,13 +307,15 @@
               </div>
             {/each}
           </div>
-        {:else}
-          <div class="names names-show">
-            {#each options as opt, i (i)}
-              <div class:strike={crossed.has(opt)}>{opt}</div>
-            {/each}
-          </div>
         {/if}
+      {:else}
+        <textarea
+          class="roul-textarea"
+          rows={6}
+          bind:value={optionsText}
+          disabled={spinning}
+          placeholder={$t('roulette.placeholder')}
+        />
       {/if}
       {#if pool.length < 2}
         <p class="roul-hint">
@@ -350,7 +346,7 @@
           title={$t('roulette.block')}
           aria-label={$t('roulette.block')}
         >
-          🔒
+          🔒{crossedCount ? ` (${crossedCount})` : ''}
         </button>
         <button
           class="btn-glass btn-ghost"
@@ -520,14 +516,6 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    transform: translateZ(0);
-  }
-
-  /* no backdrop-filter here: nested blur + hover lift paints a stripe band in Chrome */
-  .winner-box .btn-glass {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.45), rgba(236, 72, 153, 0.3));
   }
 
   .btn-sm {

@@ -127,3 +127,13 @@ button {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
 }
+
+/* Gradient text (background-clip: text + transparent fill) flashes a solid
+   bar when anything nearby repaints on hover in Chrome (e.g. the header logo
+   on every page). An own compositing layer keeps it painted correctly. */
+.logo-ww,
+.hl-ww,
+.winner-name,
+.rand-number {
+  transform: translateZ(0);
+}
