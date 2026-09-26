@@ -59,8 +59,6 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
-  $: crossedCount = options.filter((o) => crossed.has(o)).length
-  $: rawLines = optionsText ? optionsText.split('\n') : []
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -192,12 +190,6 @@
     crossed = next
   }
 
-  let gutterEl = null
-
-  function syncGutter(e) {
-    if (gutterEl) gutterEl.scrollTop = e.currentTarget.scrollTop
-  }
-
   function strikeWinner() {
     if (!winner) return
     crossed = new Set(crossed).add(winner)
@@ -313,41 +305,46 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      <div class="input-wrap">
+      <textarea
+        class="roul-textarea"
+        rows={6}
+        bind:value={optionsText}
+        disabled={spinning}
+        placeholder={$t('roulette.placeholder')}
+      />
+      {#if options.length}
         {#if blockMode}
-          <div class="lock-gutter" bind:this={gutterEl}>
-            {#each rawLines as line}
-              {@const v = line.trim()}
-              <div class="lock-cell">
-                <input
-                  type="checkbox"
-                  checked={v !== '' && crossed.has(v)}
-                  disabled={spinning || v === ''}
-                  on:change={() => toggleCross(v)}
-                  aria-label="block"
-                />
+          <div class="names names-strike">
+            {#each options as opt, i (i)}
+              <div>
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={crossed.has(opt)}
+                      disabled={spinning}
+                      on:change={() => toggleCross(opt)}
+                    />
+                    <span class:strike={crossed.has(opt)}>{opt}</span>
+                  </label>
+                </div>
               </div>
             {/each}
           </div>
+        {:else}
+          <div class="names names-show">
+            {#each options as opt, i (i)}
+              <div class:strike={crossed.has(opt)}>{opt}</div>
+            {/each}
+          </div>
         {/if}
-        <textarea
-          class="roul-textarea"
-          rows={6}
-          wrap="off"
-          bind:value={optionsText}
-          disabled={spinning}
-          on:scroll={syncGutter}
-          placeholder={$t('roulette.placeholder')}
-        />
-      </div>
+      {/if}
       {#if pool.length < 2}
         <p class="roul-hint">
           {options.length >= 2 ? $t('roulette.enableBlockHint') : $t('roulette.needMore')}
         </p>
       {:else if repeat > 1}
         <p class="roul-hint">{$t('roulette.sectors')}: {sectors.length}</p>
-      {:else if crossedCount > 0}
-        <p class="roul-hint">🚫 {$t('roulette.blocked')}: {crossedCount}</p>
       {/if}
       <div class="btn-row">
         <button class="btn-glass" on:click={spin} disabled={!canSpin}>
@@ -421,45 +418,51 @@
     color: var(--white);
   }
 
-  .input-wrap {
-    display: flex;
-    gap: 8px;
-    align-items: stretch;
-  }
-
-  .lock-gutter {
+  .names {
     display: flex;
     flex-direction: column;
-    padding-top: 11px;
-    overflow: hidden;
-    flex-shrink: 0;
+    gap: 4px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding: 10px 12px;
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 0.9rem;
+    color: var(--white);
   }
 
-  .lock-cell {
-    height: 28px;
+  .names .strike {
+    text-decoration: line-through;
+    opacity: 0.45;
+  }
+
+  .names-strike label {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 2px 0;
   }
 
-  .lock-cell input {
-    width: 17px;
-    height: 17px;
+  .names-strike input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
     margin: 0;
+    flex-shrink: 0;
     accent-color: #7c3aed;
     cursor: pointer;
   }
 
   .roul-textarea {
-    flex: 1;
-    min-width: 0;
+    width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--border-glass);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--white);
     font-size: 0.9rem;
-    line-height: 28px;
+    line-height: 1.6;
     font-family: inherit;
     outline: none;
     resize: vertical;
