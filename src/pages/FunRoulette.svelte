@@ -58,7 +58,6 @@
   $: pool = options.filter((o) => !crossed.has(o))
   $: sectors = Array.from({ length: repeat }, () => pool).flat()
   $: canSpin = !spinning && sectors.length >= 2
-  $: crossedCount = options.filter((o) => crossed.has(o)).length
   $: if (canvas && options && crossed && repeat && !spinning) drawWheel()
   $: persistOptions(optionsText)
   $: persistCrossed(crossed)
@@ -288,8 +287,15 @@
   <div class="roul-grid">
     <div class="glass roul-card">
       <h2 class="roul-card-title">📋 {$t('roulette.options')}</h2>
-      {#if blockMode}
-        {#if options.length}
+      <textarea
+        class="roul-textarea"
+        rows={6}
+        bind:value={optionsText}
+        disabled={spinning}
+        placeholder={$t('roulette.placeholder')}
+      />
+      {#if options.length}
+        {#if blockMode}
           <div class="names names-strike">
             {#each options as opt, i (i)}
               <div>
@@ -307,15 +313,13 @@
               </div>
             {/each}
           </div>
+        {:else}
+          <div class="names names-show">
+            {#each options as opt, i (i)}
+              <div class:strike={crossed.has(opt)}>{opt}</div>
+            {/each}
+          </div>
         {/if}
-      {:else}
-        <textarea
-          class="roul-textarea"
-          rows={6}
-          bind:value={optionsText}
-          disabled={spinning}
-          placeholder={$t('roulette.placeholder')}
-        />
       {/if}
       {#if pool.length < 2}
         <p class="roul-hint">
@@ -346,7 +350,7 @@
           title={$t('roulette.block')}
           aria-label={$t('roulette.block')}
         >
-          🔒{crossedCount ? ` (${crossedCount})` : ''}
+          🔒
         </button>
         <button
           class="btn-glass btn-ghost"
