@@ -62,7 +62,6 @@
     "title": "Roulette",
     "description": "Wheel of fortune — enter options and spin",
     "options": "Options",
-    "placeholder": "Enter one option per line",
     "needMore": "Add at least 2 options",
     "spin": "Spin!",
     "spinning": "Spinning…",
