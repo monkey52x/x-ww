@@ -383,7 +383,7 @@
             ↩ {$t('roulette.reset')}
           </button>
         {/if}
-        {#if hasGaps}
+        {#if mode === 'edit' && hasGaps}
           <button class="btn-glass btn-sm" on:click={trimGaps} disabled={spinning}>
             🧹 {$t('roulette.trim')}
           </button>
@@ -504,6 +504,7 @@
     font-size: 0.9rem;
     font-family: inherit;
     color: var(--white);
+    resize: vertical;
   }
 
   .names .strike {
@@ -511,8 +512,10 @@
     opacity: 0.45;
   }
 
+  /* min-height: empty rows collapse to 0, gaps would be invisible */
   .names-show > div {
     line-height: 28px;
+    min-height: 28px;
   }
 
   .names-clickable {
@@ -530,6 +533,7 @@
     gap: 8px;
     cursor: pointer;
     line-height: 28px;
+    min-height: 28px;
   }
 
   .names-strike input[type='checkbox'] {
