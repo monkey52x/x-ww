@@ -51,6 +51,7 @@
   let audioCtx = null
   let lastTick = 0
   let repeat = 1
+  let lastWinner = null
 
   $: options = optionsText
     .split('\n')
@@ -139,29 +140,43 @@
     }
   }
 
+  const EASINGS = [
+    (x) => 1 - Math.pow(1 - x, 4),
+    (x) => 1 - Math.pow(1 - x, 5),
+    (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x)),
+  ]
+
   function spin() {
     if (!canSpin) return
     spinning = true
     winner = null
     const TAU = Math.PI * 2
     const arc = TAU / sectors.length
-    const targetIndex = Math.floor(Math.random() * sectors.length)
+    let targetIndex = Math.floor(Math.random() * sectors.length)
+    // one re-roll against an instant repeat — feels more random, stays fair
+    if (new Set(pool).size > 1 && lastWinner !== null && sectors[targetIndex] === lastWinner) {
+      targetIndex = Math.floor(Math.random() * sectors.length)
+    }
     // land at a random spot inside the sector (not dead center), with edge margin
-    const EDGE = 0.18
+    const EDGE = 0.1
     const spot = EDGE + Math.random() * (1 - 2 * EDGE)
     const targetAngle = -Math.PI / 2 - (targetIndex + spot) * arc
     const start = rotation
-    const norm = (((targetAngle - start) % TAU) + TAU) % TAU
-    const fullTurns = 5 + Math.floor(Math.random() * 4)
-    const total = fullTurns * TAU + norm
-    const duration = 4500 + Math.random() * 1500
+    const dir = Math.random() < 0.5 ? 1 : -1
+    const norm =
+      dir === 1
+        ? (((targetAngle - start) % TAU) + TAU) % TAU
+        : (((start - targetAngle) % TAU) + TAU) % TAU
+    const fullTurns = 4 + Math.floor(Math.random() * 7)
+    const total = dir * (fullTurns * TAU + norm)
+    const duration = 3500 + Math.random() * 4500
+    const ease = EASINGS[Math.floor(Math.random() * EASINGS.length)]
     const t0 = performance.now()
     let lastSector = sectorAt(start)
-    const easeOutQuart = (x) => 1 - Math.pow(1 - x, 4)
 
     const frame = (now) => {
       const p = Math.min((now - t0) / duration, 1)
-      rotation = start + total * easeOutQuart(p)
+      rotation = start + total * ease(p)
       const s = sectorAt(rotation)
       if (s !== lastSector) {
         lastSector = s
@@ -174,6 +189,7 @@
         spinning = false
         // winner is whatever the pointer actually points at — by construction
         winner = sectors[sectorAt(rotation)] ?? sectors[targetIndex]
+        lastWinner = winner
       }
     }
     raf = requestAnimationFrame(frame)
