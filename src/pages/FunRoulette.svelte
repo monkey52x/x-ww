@@ -319,7 +319,7 @@
       {#if mode === 'edit'}
         <textarea
           class="roul-textarea"
-          rows={Math.min(Math.max(options.length, 1), 8)}
+          rows={Math.max(options.length, 1)}
           bind:value={optionsText}
           disabled={spinning}
           placeholder={$t('roulette.placeholder')}
@@ -495,7 +495,6 @@
   .names {
     display: flex;
     flex-direction: column;
-    max-height: 246px;
     overflow-y: auto;
     padding: 10px 12px;
     border: 1px solid var(--border-glass);
